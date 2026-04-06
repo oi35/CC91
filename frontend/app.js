@@ -12,8 +12,12 @@
     const footerText = document.getElementById('footerText');
     const verifyEmailDisplay = document.getElementById('verifyEmailDisplay');
 
+    // 全局变量：存储当前待验证的邮箱
+    let currentVerifyEmail = '';
+
     // 切换表单显示
     function showLogin() {
+        currentVerifyEmail = '';
         loginForm.classList.remove('hidden');
         registerForm.classList.remove('active');
         verifyForm.classList.remove('active');
@@ -34,6 +38,7 @@
     }
 
     function showVerify(email) {
+        currentVerifyEmail = email;
         loginForm.classList.add('hidden');
         registerForm.classList.remove('active');
         verifyForm.classList.add('active');
@@ -83,7 +88,7 @@
         setButtonState(loginBtn, true, 'Logging in...');
 
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('http://localhost:3000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -122,7 +127,7 @@
         setButtonState(registerBtn, true, 'Registering...');
 
         try {
-            const response = await fetch('/api/register', {
+            const response = await fetch('http://localhost:3000/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -150,14 +155,14 @@
     verifyForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const email = document.getElementById('regEmail').value;
+        const email = currentVerifyEmail;
         const code = document.getElementById('verificationCode').value;
 
         clearMessage();
         setButtonState(verifyBtn, true, 'Verifying...');
 
         try {
-            const response = await fetch('/api/verify-email', {
+            const response = await fetch('http://localhost:3000/api/verify-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

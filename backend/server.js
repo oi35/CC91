@@ -16,7 +16,17 @@ const LOCKOUT_TIME = 15 * 60 * 1000; // 15 分钟
 const emailVerificationCodes = new Map();
 const VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 分钟
 
-// 中间件
+// 中间件 - CORS 跨域支持
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use(express.json());
 
 // 暴力破解防护中间件
