@@ -8,8 +8,37 @@ Agent Team 可观测性系统，记录团队协作全流程。
 logs/
 ├── conversations/    # 对话记录（每轮迭代）
 ├── interventions/    # 人工干预记录
-├── snapshots/       # 代码版本快照
-└── changes/         # 变更记录
+├── snapshots/        # 代码版本快照 (已弃用)
+└── changes/         # Git 变更记录
+```
+
+> 注意：`snapshots/` 目录已弃用，请使用 Git 版本控制
+
+## Git 版本控制
+
+使用 `scripts/vcs.sh` 管理版本：
+
+```bash
+# 查看状态
+vcs status
+
+# 创建新轮次
+vcs new-turn
+
+# 创建快照
+vcs snapshot "登录功能完成"
+
+# 干预前快照
+vcs intervention "添加密码哈希"
+
+# 查看历史
+vcs history
+
+# 切换版本
+vcs checkout v1.0
+
+# 合并到 main
+vcs merge
 ```
 
 ## 记录格式
@@ -29,16 +58,10 @@ logs/
 | 时间 | 角色 | 事件 | 详情 | 状态 |
 |------|------|------|------|------|
 | 14:30 | user | 发送任务 | 实现登录 | ✅ |
-| 14:30 | team-lead | 分解任务 | 创建3个子任务 | ✅ |
-| 14:31 | backend | 执行 | 编写API | 🔄 |
 
 ## 决策记录
 - 14:35 - 用户干预：要求添加密码哈希
 - 14:40 - 决策：采用 bcrypt 方案
-
-## 变更摘要
-- backend/server.js: +50 行
-- frontend/app.js: +20 行
 ```
 
 ### 干预记录 (interventions/intervention_N.md)
@@ -65,24 +88,26 @@ logs/
 - 影响范围: backend
 ```
 
-## 快照机制
+## 快照机制 (Git)
 
 ### 自动快照点
-- 任务开始时
-- 任务完成时
-- 人工干预前
-- 迭代结束时
+- `vcs new-turn` - 任务开始时
+- `vcs snapshot` - 任务完成时
+- `vcs intervention` - 人工干预前
+- `vcs merge` - 迭代结束时
 
-### 快照内容
+### Git 分支模型
 ```
-snapshots/snapshot_20240406_143000/
-├── backend/
-│   ├── server.js
-│   └── package.json
-├── frontend/
-│   ├── index.html
-│   └── app.js
-└── metadata.json
+main (稳定版本)
+  └── turn/1 (当前轮次)
+  └── turn/2 (下一轮次)
+```
+
+### Git 标签
+```
+v1.0        - Turn 1 初始状态
+v1.143025   - Turn 1 快照 (时间戳)
+v1.pre-add-password-hash - 干预前快照
 ```
 
 ## 协作追踪
@@ -98,24 +123,23 @@ snapshots/snapshot_20240406_143000/
 
 ## 使用方式
 
-### 记录事件
-```javascript
-// 在 agent 中调用
-logEvent({
-  type: 'task_start',
-  agent: 'backend',
-  task: '登录API实现',
-  timestamp: new Date().toISOString()
-})
+### 在 agent 中使用
+```bash
+# 创建新轮次
+vcs new-turn
+
+# 快照
+vcs snapshot "功能描述"
+
+# 干预前
+vcs intervention "类型"
 ```
 
-### 创建快照
+### 查看状态
 ```bash
-# 自动快照
-snapshot.sh create "登录功能完成"
-
-# 恢复快照
-snapshot.sh restore snapshot_20240406_143000
+vcs status    # 查看当前状态
+vcs history   # 查看版本历史
+vcs log       # 查看变更日志
 ```
 
 ## 配置
@@ -126,7 +150,8 @@ snapshot.sh restore snapshot_20240406_143000
   "teamObservability": {
     "enabled": true,
     "logPath": "logs/",
-    "autoSnapshot": true,
+    "useGit": true,
+    "vcsScript": "scripts/vcs.sh",
     "interventionPoints": ["BEFORE_TASK", "AFTER_FAILURE"]
   }
 }

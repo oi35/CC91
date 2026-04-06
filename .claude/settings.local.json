@@ -7,7 +7,8 @@
       "Bash(ls ~/.claude/tasks/fullstack-dev/*.json)",
       "Bash(npm install:*)",
       "Bash(bash scripts/vcs.sh status)",
-      "Bash(bash scripts/vcs.sh snapshot \"登录功能完成\")"
+      "Bash(bash scripts/vcs.sh snapshot \"登录功能完成\")",
+      "Bash(bash scripts/vcs.sh history)"
     ]
   }
 }
