@@ -92,3 +92,72 @@ button:disabled {
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
+
+/* 注册相关样式 */
+.auth-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.auth-container .toggle-btn {
+    width: auto;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+}
+
+.auth-container .toggle-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.auth-container .toggle-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* 注册表单 */
+#registerForm {
+    display: none;
+}
+
+#registerForm.active,
+#verifyForm.active {
+    display: block;
+}
+
+#loginForm.hidden {
+    display: none;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.form-footer a {
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* 验证码输入框 */
+.verification-info {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #555;
+    font-size: 0.875rem;
+}
+
+.verification-info strong {
+    color: #333;
+}
