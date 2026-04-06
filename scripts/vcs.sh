@@ -42,7 +42,7 @@ new_turn() {
     git commit -m "chore: start turn_${turn_num}
 
 [Turn ${turn_num}]
-- 开始新的迭代周期" 2>/dev/null || true
+- 开始新的迭代周期"
 
     # 创建标签
     git tag -a "${TAG_PREFIX}${turn_num}.0" -m "Turn ${turn_num} 初始状态"
@@ -59,8 +59,6 @@ new_turn() {
 snapshot() {
     local description="${1:-snapshot}"
     local turn_num=$(get_turn_num)
-    local current_branch=$(get_branch)
-    local version_num=$(git tag --list "${TAG_PREFIX}${turn_num}.*" | wc -l | tr -d ' ')
 
     echo -e "${BLUE}创建快照: ${description}${NC}"
 
@@ -68,11 +66,10 @@ snapshot() {
     git add -A
     git commit -m "snapshot: ${description}
 
-[Turn ${turn_num}]
-$(git diff --stat HEAD~1 2>/dev/null | tail -n +2 || echo "Initial snapshot")"
+[Turn ${turn_num}]"
 
     # 创建标签
-    local new_version="${TAG_PREFIX}${turn_num}.${version_num}"
+    local new_version="${TAG_PREFIX}${turn_num}.$(date +%H%M%S)"
     git tag -a "$new_version" -m "${description}"
 
     echo -e "${GREEN}快照已创建: ${new_version}${NC}"
@@ -85,8 +82,7 @@ $(git diff --stat HEAD~1 2>/dev/null | tail -n +2 || echo "Initial snapshot")"
 snapshot_before_intervention() {
     local intervention_type="${1:-manual}"
     local turn_num=$(get_turn_num)
-    local version_num=$(git tag --list "${TAG_PREFIX}${turn_num}.*" | wc -l | tr -d ' ')
-    local new_version="${TAG_PREFIX}${turn_num}.${version_num}-pre-${intervention_type}"
+    local new_version="${TAG_PREFIX}${turn_num}.pre-${intervention_type}-$(date +%H%M%S)"
 
     echo -e "${YELLOW}创建干预前快照: ${intervention_type}${NC}"
 
@@ -118,7 +114,7 @@ history() {
 }
 
 # 查看变更
-diff() {
+diff_version() {
     local ref="${1:-HEAD}"
     echo -e "${CYAN}=== 变更: ${ref} ===${NC}"
     git diff "$ref" --stat
@@ -149,11 +145,7 @@ merge_to_main() {
     echo -e "${BLUE}合并 ${branch_name} 到 main${NC}"
 
     git checkout main
-    git merge "$branch_name" --no-ff -m "merge: turn_${turn_num} completed
-
-完成 turn_${turn_num} 迭代
-
-标签: ${TAG_PREFIX}${turn_num}.*"
+    git merge "$branch_name" --no-ff -m "merge: turn_${turn_num} completed"
 
     echo -e "${GREEN}已合并到 main${NC}"
 }
@@ -170,21 +162,21 @@ log_change() {
 
     # 创建或追加日志
     if [ ! -f "$log_file" ]; then
-        cat > "$log_file" << EOF
-# 变更记录: turn_${turn_num}
+        cat > "$log_file" << 'HEADER'
+# 变更记录: turn_N
 
 ## 变更流
 
 | 时间 | 类型 | 描述 | 引用 |
 |------|------|------|------|
-EOF
+HEADER
     fi
 
     echo "| ${timestamp} | ${type} | ${description} | \`${ref}\` |" >> "$log_file"
 }
 
 # 状态
-status() {
+show_status() {
     echo -e "${CYAN}=== Agent Team 版本状态 ===${NC}"
     echo ""
     echo -e "${YELLOW}当前分支:${NC} $(get_branch)"
@@ -196,27 +188,18 @@ status() {
 }
 
 # 帮助
-help() {
-    cat << EOF
-${CYAN}Agent Team Git 版本控制${NC}
-
-${YELLOW}命令:${NC}
-  vcs new-turn           创建新轮次分支
-  vcs snapshot [描述]    创建快照（提交）
-  vcs intervention [类型] 创建干预前快照
-  vcs history            查看版本历史
-  vcs diff [版本]        查看变更
-  vcs checkout [版本]    切换版本
-  vcs merge              合并到 main
-  vcs status             查看状态
-  vcs log                查看变更日志
-
-${YELLOW}示例:${NC}
-  vcs new-turn
-  vcs snapshot "登录功能完成"
-  vcs intervention "添加密码哈希"
-  vcs checkout v1.0
-EOF
+show_help() {
+    echo "Agent Team Git 版本控制"
+    echo ""
+    echo "命令:"
+    echo "  vcs new-turn           创建新轮次分支"
+    echo "  vcs snapshot [描述]    创建快照（提交）"
+    echo "  vcs intervention [类型] 创建干预前快照"
+    echo "  vcs history            查看版本历史"
+    echo "  vcs diff [版本]        查看变更"
+    echo "  vcs checkout [版本]    切换版本"
+    echo "  vcs merge             合并到 main"
+    echo "  vcs status            查看状态"
 }
 
 # 主命令处理
@@ -234,7 +217,7 @@ case "$1" in
         history
         ;;
     diff)
-        diff "$2"
+        diff_version "$2"
         ;;
     checkout)
         checkout_version "$2"
@@ -243,21 +226,17 @@ case "$1" in
         merge_to_main
         ;;
     status)
-        status
-        ;;
-    log)
-        cat logs/changes/turn_*.md 2>/dev/null || echo "暂无变更记录"
+        show_status
         ;;
     help|--help|-h)
-        help
+        show_help
         ;;
     *)
         if [ -z "$1" ]; then
-            status
+            show_status
         else
             echo -e "${RED}未知命令: $1${NC}"
-            help
+            show_help
         fi
         ;;
 esac
-EOF

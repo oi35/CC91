@@ -5,7 +5,8 @@
       "Bash(mv .agents/skills/vercel-react-best-practices .claude/skills/)",
       "Bash(cat ~/.claude/tasks/fullstack-dev/*.json)",
       "Bash(ls ~/.claude/tasks/fullstack-dev/*.json)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(bash scripts/vcs.sh status)"
     ]
   }
 }
