@@ -47,6 +47,6 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 -- 插入测试数据 (仅开发环境)
 INSERT INTO users (username, email, password_hash) VALUES
-('admin', 'admin@cc91.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'), -- password: admin123
-('test', 'test@cc91.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy') -- password: admin123
+('admin', 'admin@cc91.com', '$2b$10$vh2JRM/h5MUu1vSY/qiD3uVRmF0.Uh.wSbmlxUYyStsL/VWZ9mM1i'), -- password: admin123
+('test', 'test@cc91.com', '$2b$10$vh2JRM/h5MUu1vSY/qiD3uVRmF0.Uh.wSbmlxUYyStsL/VWZ9mM1i') -- password: admin123
 ON DUPLICATE KEY UPDATE username=VALUES(username);

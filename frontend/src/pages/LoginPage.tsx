@@ -27,7 +27,7 @@ export default function LoginPage() {
 
       const { accessToken } = response.data;
       login(username, accessToken);
-      navigate('/dashboard');
+      navigate(`/profile/${username}`);
     } catch (err: any) {
       const message = err.response?.data?.message || '登录失败，请重试';
       setError(message);
