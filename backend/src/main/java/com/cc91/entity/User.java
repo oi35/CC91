@@ -99,4 +99,7 @@ public class User {
         }
         return LocalDateTime.now().isBefore(lockUntil);
     }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserProfile profile;
 }
